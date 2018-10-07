@@ -19,11 +19,37 @@ const users = [
   }
 ];
 
+const posts = [
+  {
+    id: "1",
+    title: "First Post",
+    body: "This is the first post",
+    published: true,
+    author: "3662"
+  },
+  {
+    id: "2",
+    title: "Second Post",
+    body: "This is the second post",
+    published: true,
+    author: "3662"
+  },
+  {
+    id: "3",
+    title: "Coming Soon",
+    body: "This will be amazing",
+    published: false,
+    author: "33272"
+  }
+];
+
 const typeDefs = `
   type Query {
     hello: String!
     me: User!
+    users: [User!]!
     post: Post!
+    posts: [Post!]!
   }
 
   type User {
@@ -55,6 +81,9 @@ const resolvers = {
         age: 29
       };
     },
+    users() {
+      return users;
+    },
     post() {
       return {
         id: "1",
@@ -63,6 +92,9 @@ const resolvers = {
         published: true,
         author: "3662"
       };
+    },
+    posts() {
+      return posts;
     }
   },
   Post: {
