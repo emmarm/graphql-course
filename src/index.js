@@ -72,11 +72,10 @@ const comments = [
 
 const typeDefs = `
   type Query {
-    hello: String!
     me: User!
-    users(query: String!): [User!]!
+    users(query: String): [User!]!
     post: Post!
-    posts(query: String!): [Post!]!
+    posts(query: String): [Post!]!
     comments: [Comment!]!
   }
 
@@ -86,6 +85,7 @@ const typeDefs = `
     email: String!
     age: Int
     posts: [Post!]!
+    comments: [Comment!]!
   }
 
   type Post {
@@ -94,6 +94,7 @@ const typeDefs = `
     body: String!
     published: Boolean!
     author: User!
+    comments: [Comment!]!
   }
 
   type Comment {
@@ -106,9 +107,6 @@ const typeDefs = `
 
 const resolvers = {
   Query: {
-    hello() {
-      return "Hello GraphQL!";
-    },
     me() {
       return {
         id: "3662",
@@ -152,11 +150,17 @@ const resolvers = {
   Post: {
     author(parent, args, ctx, info) {
       return users.find(user => user.id === parent.author);
+    },
+    comments(parent, args, ctx, info) {
+      return comments.filter(comment => comment.post === parent.id);
     }
   },
   User: {
     posts(parent, args, ctx, info) {
       return posts.filter(post => post.author === parent.id);
+    },
+    comments(parent, args, ctx, info) {
+      return comments.filter(comment => comment.author === parent.id);
     }
   },
   Comment: {
