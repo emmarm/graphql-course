@@ -84,6 +84,7 @@ const typeDefs = `
     createUser(data: CreateUserInput): User!
     deleteUser(id: ID!): User!
     createPost(data: CreatePostInput): Post!
+    createComment(data: CreateCommentInput!): Comment!
   }
 
   input CreateUserInput {
@@ -97,6 +98,12 @@ const typeDefs = `
     body: String!
     published: Boolean!
     author: ID!
+  }
+
+  input CreateCommentInput {
+    text: String!
+    author: ID!
+    post: ID!
   }
 
   type User {
@@ -219,6 +226,27 @@ const resolvers = {
 
       posts.push(post);
       return post;
+    },
+    createComment(parent, args, ctx, info) {
+      const authorFound = users.some(user => user.id === args.data.author);
+      const postFound = posts.some(
+        post => post.id === args.data.post && post.published
+      );
+
+      if (!authorFound) {
+        throw new Error("Comment author not found");
+      } else if (!postFound) {
+        throw new Error("Post not found");
+      }
+
+      const comment = {
+        id: uuidv4(),
+        ...args.data
+      };
+
+      comments.push(comment);
+
+      return comment;
     }
   },
   Post: {
