@@ -4,6 +4,7 @@ const typeDefs = `
   type Query {
     hello: String!
     me: User!
+    post: Post!
   }
 
   type User {
@@ -11,6 +12,13 @@ const typeDefs = `
     name: String!
     email: String!
     age: Int
+  }
+
+  type Post {
+    id: ID!
+    title: String!
+    body: String!
+    published: Boolean!
   }
 `;
 
@@ -25,6 +33,14 @@ const resolvers = {
         name: "Emma",
         email: "emma@example.com",
         age: 29
+      };
+    },
+    post() {
+      return {
+        id: "1",
+        title: "First Post",
+        body: "This is the first post",
+        published: true
       };
     }
   }
