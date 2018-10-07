@@ -47,9 +47,9 @@ const typeDefs = `
   type Query {
     hello: String!
     me: User!
-    users: [User!]!
+    users(query: String!): [User!]!
     post: Post!
-    posts: [Post!]!
+    posts(query: String!): [Post!]!
   }
 
   type User {
@@ -82,8 +82,13 @@ const resolvers = {
         age: 29
       };
     },
-    users() {
-      return users;
+    users(parent, args, ctx, info) {
+      if (!args.query) {
+        return users;
+      }
+      return users.filter(user =>
+        user.name.toLowerCase().includes(args.query.toLowerCase())
+      );
     },
     post() {
       return {
@@ -94,8 +99,16 @@ const resolvers = {
         author: "3662"
       };
     },
-    posts() {
-      return posts;
+    posts(parent, args, ctx, info) {
+      if (!args.query) {
+        return posts;
+      }
+      return posts.filter(post => {
+        const query = args.query.toLowerCase();
+        const hasTitleMatch = post.title.toLowerCase().includes(query);
+        const hasBodyMatch = post.body.toLowerCase().includes(query);
+        return hasTitleMatch || hasBodyMatch;
+      });
     }
   },
   Post: {
