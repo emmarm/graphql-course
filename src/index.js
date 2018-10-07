@@ -43,6 +43,33 @@ const posts = [
   }
 ];
 
+const comments = [
+  {
+    id: "111",
+    text: "Great post!",
+    author: "33272",
+    post: "1"
+  },
+  {
+    id: "222",
+    text: "Check out this related post",
+    author: "3742",
+    post: "1"
+  },
+  {
+    id: "333",
+    text: "Cool, thanks for sharing!",
+    author: "33272",
+    post: "2"
+  },
+  {
+    id: "444",
+    text: "Love it!",
+    author: "3742",
+    post: "2"
+  }
+];
+
 const typeDefs = `
   type Query {
     hello: String!
@@ -50,6 +77,7 @@ const typeDefs = `
     users(query: String!): [User!]!
     post: Post!
     posts(query: String!): [Post!]!
+    comments: [Comment!]!
   }
 
   type User {
@@ -66,6 +94,13 @@ const typeDefs = `
     body: String!
     published: Boolean!
     author: User!
+  }
+
+  type Comment {
+    id: ID!
+    text: String!
+    author: User!
+    post: Post!
   }
 `;
 
@@ -109,6 +144,9 @@ const resolvers = {
         const hasBodyMatch = post.body.toLowerCase().includes(query);
         return hasTitleMatch || hasBodyMatch;
       });
+    },
+    comments() {
+      return comments;
     }
   },
   Post: {
@@ -119,6 +157,14 @@ const resolvers = {
   User: {
     posts(parent, args, ctx, info) {
       return posts.filter(post => post.author === parent.id);
+    }
+  },
+  Comment: {
+    author(parent, args, ctx, info) {
+      return users.find(user => user.id === parent.author);
+    },
+    post(parent, args, ctx, info) {
+      return posts.find(post => post.id === parent.post);
     }
   }
 };
