@@ -7,12 +7,12 @@ const Query = {
       age: 29
     };
   },
-  users(parent, args, { db }, info) {
-    if (!args.query) {
+  users(parent, { query }, { db }, info) {
+    if (!query) {
       return db.users;
     }
     return db.users.filter(user =>
-      user.name.toLowerCase().includes(args.query.toLowerCase())
+      user.name.toLowerCase().includes(query.toLowerCase())
     );
   },
   post() {
@@ -24,14 +24,14 @@ const Query = {
       author: "3662"
     };
   },
-  posts(parent, args, { db }, info) {
-    if (!args.query) {
+  posts(parent, { query }, { db }, info) {
+    if (!query) {
       return db.posts;
     }
     return db.posts.filter(post => {
-      const query = args.query.toLowerCase();
-      const hasTitleMatch = post.title.toLowerCase().includes(query);
-      const hasBodyMatch = post.body.toLowerCase().includes(query);
+      const q = query.toLowerCase();
+      const hasTitleMatch = post.title.toLowerCase().includes(q);
+      const hasBodyMatch = post.body.toLowerCase().includes(q);
       return hasTitleMatch || hasBodyMatch;
     });
   },
