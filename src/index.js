@@ -1,5 +1,24 @@
 import { GraphQLServer } from "graphql-yoga";
 
+const users = [
+  {
+    id: "3662",
+    name: "Emma",
+    email: "emma@example.com",
+    age: 29
+  },
+  {
+    id: "33272",
+    name: "Debra",
+    email: "debra@example.com"
+  },
+  {
+    id: "3742",
+    name: "Eric",
+    email: "eric@example.com"
+  }
+];
+
 const typeDefs = `
   type Query {
     hello: String!
@@ -19,6 +38,7 @@ const typeDefs = `
     title: String!
     body: String!
     published: Boolean!
+    author: User!
   }
 `;
 
@@ -40,8 +60,14 @@ const resolvers = {
         id: "1",
         title: "First Post",
         body: "This is the first post",
-        published: true
+        published: true,
+        author: "3662"
       };
+    }
+  },
+  Post: {
+    author(parent, args, ctx, info) {
+      return users.find(user => user.id === parent.author);
     }
   }
 };
