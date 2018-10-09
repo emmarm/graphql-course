@@ -79,13 +79,19 @@ const Mutation = {
 
     db.posts.push(post);
     if (post.published) {
-      pubsub.publish("post", { post });
+      pubsub.publish("post", {
+        post: {
+          mutation: "CREATED",
+          data: post
+        }
+      });
     }
 
     return post;
   },
-  updatePost(parent, { id, data }, { db }, info) {
+  updatePost(parent, { id, data }, { db, pubsub }, info) {
     const post = db.posts.find(post => post.id === id);
+    const prevPost = { ...post };
 
     if (!post) {
       throw new Error("Post not found");
@@ -101,22 +107,54 @@ const Mutation = {
 
     if (typeof data.published === "boolean") {
       post.published = data.published;
+
+      if (prevPost.published && !post.published) {
+        pubsub.publish("post", {
+          post: {
+            mutation: "DELETED",
+            data: prevPost
+          }
+        });
+      } else if (!prevPost.published && post.published) {
+        pubsub.publish("post", {
+          post: {
+            mutation: "CREATED",
+            data: post
+          }
+        });
+      } else if (post.published) {
+        pubsub.publish("post", {
+          post: {
+            mutation: "UPDATED",
+            data: post
+          }
+        });
+      }
     }
 
     return post;
   },
-  deletePost(parent, { id }, { db }, info) {
+  deletePost(parent, { id }, { db, pubsub }, info) {
     const postIndex = db.posts.findIndex(post => post.id === id);
 
     if (postIndex === -1) {
       throw new Error("Post not found");
     }
 
-    const deletedPosts = db.posts.splice(postIndex, 1);
+    const [post] = db.posts.splice(postIndex, 1);
 
     db.comments = db.comments.filter(comment => comment.post !== id);
 
-    return deletedPosts[0];
+    if (post.published) {
+      pubsub.publish("post", {
+        post: {
+          mutation: "DELETED",
+          data: post
+        }
+      });
+    }
+
+    return post;
   },
   createComment(parent, { data }, { db, pubsub }, info) {
     const authorFound = db.users.some(user => user.id === data.author);
