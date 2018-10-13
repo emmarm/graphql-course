@@ -7,13 +7,23 @@ const Query = {
       age: 29
     };
   },
-  users(parent, { query }, { db }, info) {
-    if (!query) {
-      return db.users;
+  users(parent, { query }, { prisma }, info) {
+    const opArgs = {};
+
+    if (query) {
+      opArgs.where = {
+        OR: [
+          {
+            name_contains: query
+          },
+          {
+            email_contains: query
+          }
+        ]
+      };
     }
-    return db.users.filter(user =>
-      user.name.toLowerCase().includes(query.toLowerCase())
-    );
+
+    return prisma.query.users(opArgs, info);
   },
   post() {
     return {
@@ -24,19 +34,25 @@ const Query = {
       author: "3662"
     };
   },
-  posts(parent, { query }, { db }, info) {
-    if (!query) {
-      return db.posts;
+  posts(parent, { query }, { prisma }, info) {
+    const opArgs = {};
+
+    if (query) {
+      opArgs.where = {
+        OR: [
+          {
+            title_contains: query
+          },
+          {
+            body_contains: query
+          }
+        ]
+      };
     }
-    return db.posts.filter(post => {
-      const q = query.toLowerCase();
-      const hasTitleMatch = post.title.toLowerCase().includes(q);
-      const hasBodyMatch = post.body.toLowerCase().includes(q);
-      return hasTitleMatch || hasBodyMatch;
-    });
+    return prisma.query.posts(opArgs, info);
   },
-  comments(parent, args, { db }, info) {
-    return db.comments;
+  comments(parent, args, { prisma }, info) {
+    return prisma.query.comments(null, info);
   }
 };
 
