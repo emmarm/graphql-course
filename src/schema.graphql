@@ -21,8 +21,8 @@ type Mutation {
 }
 
 type Subscription {
-  count: Int!
   post: PostSubscriptionPayload!
+  myPost: PostSubscriptionPayload!
   comment(postId: ID!): CommentSubscriptionPayload!
 }
 
