@@ -55,20 +55,29 @@ const Query = {
     return posts[0];
   },
   posts(parent, { query }, { prisma }, info) {
-    const opArgs = {};
+    const opArgs = {
+      where: {
+        published: true
+      }
+    };
 
     if (query) {
-      opArgs.where = {
-        OR: [
-          {
-            title_contains: query
-          },
-          {
-            body_contains: query
-          }
-        ]
-      };
+      opArgs.where.OR = [{ title_contains: query }, { body_contains: query }];
     }
+    return prisma.query.posts(opArgs, info);
+  },
+  myPosts(parent, { query }, { prisma, request }, info) {
+    const userId = getUserId(request);
+    const opArgs = {
+      where: {
+        author: { id: userId }
+      }
+    };
+
+    if (query) {
+      opArgs.where.OR = [{ title_contains: query }, { body_contains: query }];
+    }
+
     return prisma.query.posts(opArgs, info);
   },
   comments(parent, args, { prisma }, info) {
