@@ -13,14 +13,7 @@ const Query = {
 
     if (query) {
       opArgs.where = {
-        OR: [
-          {
-            name_contains: query
-          },
-          {
-            email_contains: query
-          }
-        ]
+        name_contains: query
       };
     }
 
