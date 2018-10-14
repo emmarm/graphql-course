@@ -13,6 +13,8 @@ const getUserId = (request, requireAuth = true) => {
   if (requireAuth) {
     throw new Error("Authorization required");
   }
+
+  return null;
 };
 
 export default getUserId;
