@@ -8,8 +8,12 @@ const Query = {
       where: { id: userId }
     });
   },
-  users(parent, { query }, { prisma }, info) {
-    const opArgs = {};
+  users(parent, { query, first, skip, after }, { prisma }, info) {
+    const opArgs = {
+      first,
+      skip,
+      after
+    };
 
     if (query) {
       opArgs.where = {
@@ -47,8 +51,11 @@ const Query = {
 
     return posts[0];
   },
-  posts(parent, { query }, { prisma }, info) {
+  posts(parent, { query, first, skip, after }, { prisma }, info) {
     const opArgs = {
+      first,
+      skip,
+      after,
       where: {
         published: true
       }
@@ -59,9 +66,12 @@ const Query = {
     }
     return prisma.query.posts(opArgs, info);
   },
-  myPosts(parent, { query }, { prisma, request }, info) {
+  myPosts(parent, { query, first, skip, after }, { prisma, request }, info) {
     const userId = getUserId(request);
     const opArgs = {
+      first,
+      skip,
+      after,
       where: {
         author: { id: userId }
       }
@@ -73,8 +83,14 @@ const Query = {
 
     return prisma.query.posts(opArgs, info);
   },
-  comments(parent, args, { prisma }, info) {
-    return prisma.query.comments(null, info);
+  comments(parent, { first, skip, after }, { prisma }, info) {
+    const opArgs = {
+      first,
+      skip,
+      after
+    };
+
+    return prisma.query.comments(opArgs, info);
   }
 };
 
