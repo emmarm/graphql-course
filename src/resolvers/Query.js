@@ -8,11 +8,12 @@ const Query = {
       where: { id: userId }
     });
   },
-  users(parent, { query, first, skip, after }, { prisma }, info) {
+  users(parent, { query, first, skip, after, orderBy }, { prisma }, info) {
     const opArgs = {
       first,
       skip,
-      after
+      after,
+      orderBy
     };
 
     if (query) {
@@ -30,16 +31,7 @@ const Query = {
       {
         where: {
           id,
-          OR: [
-            {
-              published: true
-            },
-            {
-              author: {
-                id: userId
-              }
-            }
-          ]
+          OR: [{ published: true }, { author: { id: userId } }]
         }
       },
       info
@@ -51,11 +43,12 @@ const Query = {
 
     return posts[0];
   },
-  posts(parent, { query, first, skip, after }, { prisma }, info) {
+  posts(parent, { query, first, skip, after, orderBy }, { prisma }, info) {
     const opArgs = {
       first,
       skip,
       after,
+      orderBy,
       where: {
         published: true
       }
@@ -66,12 +59,18 @@ const Query = {
     }
     return prisma.query.posts(opArgs, info);
   },
-  myPosts(parent, { query, first, skip, after }, { prisma, request }, info) {
+  myPosts(
+    parent,
+    { query, first, skip, after, orderBy },
+    { prisma, request },
+    info
+  ) {
     const userId = getUserId(request);
     const opArgs = {
       first,
       skip,
       after,
+      orderBy,
       where: {
         author: { id: userId }
       }
@@ -83,12 +82,8 @@ const Query = {
 
     return prisma.query.posts(opArgs, info);
   },
-  comments(parent, { first, skip, after }, { prisma }, info) {
-    const opArgs = {
-      first,
-      skip,
-      after
-    };
+  comments(parent, { first, skip, after, orderBy }, { prisma }, info) {
+    const opArgs = { first, skip, after, orderBy };
 
     return prisma.query.comments(opArgs, info);
   }
